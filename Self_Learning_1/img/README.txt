@@ -1,1 +1,4 @@
-Folder ini akan menyimpan image/gambar yang akan digunakan pada Self Learning 1
+PENTING !
+**
+Folder img berfungsi untuk menyimpan gambar pada saat registrasi
+**
