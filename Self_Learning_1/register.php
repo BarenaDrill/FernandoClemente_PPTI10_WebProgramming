@@ -1,5 +1,6 @@
 <?php 
-   session_start();
+   
+   $db = mysqli_connect("localhost","root","","selfLearning2");
    $status = 0 ;
 
    function upload(){
@@ -33,7 +34,46 @@
       return $namaFile ;
    }
 
+   function registrasi($data){
+
+      global $db;
+      $username = stripslashes($data['username']) ;
+      $password = mysqli_real_escape_string($db,$data['password']) ;
+      $namaDepan = $data['namaDepan'];
+      $namaTengah = $data['namaTengah'] ;
+      $namaBelakang = $data['namaBelakang'];
+      $tempatLahir = $data['tempatLahir'];
+      $tglLahir = strtotime($data["tanggalLahir"]);
+      $tglLahir = date('Y-m-d', $tglLahir);
+      $NIK= $data['NIK'];
+      $wargaNegara = $data['wargaNegara'];
+      $email = $data['email'];
+      $noHP = $data['noHP'];
+      $alamat = $data['alamat'];
+      $kodePos = $data['kodePos'];
+      $fotoProfil = upload();
+
+      $result = mysqli_query($db,"SELECT username FROM user WHERE username = '$username' ") ;
+      if(mysqli_fetch_assoc($result)){
+         echo "<script>
+            alert('username sudah terdaftar');
+         </script>" ;
+         return false ;
+      }
+
+      $password = password_hash($password,PASSWORD_DEFAULT) ;
+
+      mysqli_query($db,"INSERT INTO user 
+      VALUES ('','$namaDepan','$namaTengah','$namaBelakang','$tempatLahir','$tglLahir','$NIK','$wargaNegara','$email','$noHP','$alamat','$kodePos','$fotoProfil','$username','$password')") ;
+
+      return mysqli_affected_rows($db) ;
+
+   }
+
    if(isset($_POST['submit'])){
+
+      $username = $_POST['username'] ;
+      $result = mysqli_query($db,"SELECT username FROM user WHERE username = '$username' ") ;
 
       if ($_POST['confirmPassword'] != $_POST['password']){
          echo "<script>
@@ -50,7 +90,6 @@
                   !preg_match("/^[a-zA-Z]*$/",$_POST['wargaNegara']) || 
                   !preg_match("/^[a-zA-Z0-9._-]*+[@]+[a-zA-Z0-9]*+[.]+[a-zA-Z]*$/",$_POST['email']) || 
                   (!preg_match("/^[0-9+]*$/",$_POST['noHP']) || strlen($_POST['noHP']) <  10) ||
-                  !preg_match("/^[a-zA-Z0-9._-]*$/",$_POST['alamat'])  || 
                   !preg_match("/^[0-9]*$/",$_POST['kodePos']) || 
                   (!preg_match("/^[a-zA-Z0-9-_.]*$/",$_POST['username']) || strlen($_POST['username']) < 3) ||
                   (!preg_match("/^[a-zA-Z0-9-_.!@#$%^&*()+=]*$/",$_POST['password']) ||strlen($_POST['password']) <  3) ||
@@ -61,35 +100,28 @@
                   alert('Mohon isi data sesuai dengan ketentuan');
                </script>" ;
          $status++;               
-      }else{
-
-         $username = $_POST['username'];
-         $password = $_POST['username'];
-
-         $_SESSION['usernameSession'] = $username;
-         $_SESSION['passwordSession'] = $password;
-         $_SESSION['namaDepan'] = $_POST['namaDepan'];
-         $_SESSION['namaTengah'] = $_POST['namaTengah'];
-         $_SESSION['namaBelakang'] = $_POST['namaBelakang'];
-         $_SESSION['tempatLahir'] = $_POST['tempatLahir'];
-         $_SESSION['tanggalLahir'] = $_POST['tanggalLahir'];
-         $_SESSION['NIK'] = $_POST['NIK'];
-         $_SESSION['wargaNegara'] = $_POST['wargaNegara'];
-         $_SESSION['email'] = $_POST['email'];
-         $_SESSION['noHP'] = $_POST['noHP'];
-         $_SESSION['alamat'] = $_POST['alamat'];
-         $_SESSION['kodePos'] = $_POST['kodePos'];
-         $_SESSION['fotoProfil'] = upload();
-        
+      }else if(mysqli_fetch_assoc($result)){
          echo "<script>
-                  alert('Registrasi Sukses');
-                  document.location.href = 'welcome.php' ;
-               </script>";
-         
+            alert('username sudah terdaftar');
+         </script>" ;
+         $status++;               
+      }else{
+         if(registrasi($_POST) > 0){
+            echo "<script>
+               alert('user baru berhasil ditambahkan') ;
+               document.location.href = 'welcome.php' ;
+            </script>" ;
+         }else{
+            echo mysqli_error($db) ;
+         }
       }
 
    }
+
+
+
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -230,17 +262,16 @@
                <td ><label for="NIK">NIK</label></td>
                <td ><input type="text" name="NIK" id="NIK" required></td>
             </tr>
-               <?php if($status != 0) { ?>
-                  <td></td>
-                  <td class="errorMsg">* Only letters allowed !</td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td class="errorMsg">* 16 numbers required !</td>
-               <?php } ?>
+            <?php if($status != 0) { ?>
+               <td></td>
+               <td class="errorMsg">* Only letters allowed !</td>
+               <td></td>
+               <td></td>
+               <td></td>
+               <td class="errorMsg">* 16 numbers required !</td>
+            <?php } ?>
             <tr class="space"></tr>
-            <tr>
-               
+            <tr>     
                <td ><label for="wargaNegara">Warga Negara</label></td>
                <td ><input type="text" name="wargaNegara" id="wargaNegara" required></td>
                <td ><label for="email">Email</label></td>
@@ -248,14 +279,14 @@
                <td ><label for="noHP">No HP</label></td>
                <td ><input type="text" name="noHP" id="noHP" required></td>
             </tr>
-               <?php if($status != 0) { ?>
-                  <td></td>
-                  <td class="errorMsg">* Only letters allowed !</td>
-                  <td></td>
-                  <td class="errorMsg">* ex. abc@gmail.com ! <br> (harus ada @ dan '.' )</td>
-                  <td></td>
-                  <td class="errorMsg">* minimal 10 numbers required ! <br> (boleh diawali dengan +)</td>
-               <?php } ?>
+            <?php if($status != 0) { ?>
+               <td></td>
+               <td class="errorMsg">* Only letters allowed !</td>
+               <td></td>
+               <td class="errorMsg">* ex. abc@gmail.com ! <br> (harus ada @ dan '.' )</td>
+               <td></td>
+               <td class="errorMsg">* minimal 10 numbers required ! <br> (boleh diawali dengan +)</td>
+            <?php } ?>
             <tr class="space"></tr>
             <tr>
                <td ><label for="alamat">Alamat</label></td>
