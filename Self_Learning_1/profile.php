@@ -1,5 +1,17 @@
 <?php 
    session_start();
+
+   if(!isset($_SESSION["id"])){
+      header("Location: welcome.php");
+      exit;
+   }
+
+   $db = mysqli_connect("localhost","root","","selfLearning2");
+   $id = $_SESSION['id'];
+   $result = mysqli_query($db,"SELECT * FROM user WHERE id = '$id' ") ;
+
+   $row = mysqli_fetch_assoc($result);
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -7,7 +19,7 @@
    <meta charset="UTF-8">
    <meta http-equiv="X-UA-Compatible" content="IE=edge">
    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-   <title>Home</title>
+   <title>Profile</title>
    <style>
       body{
          background-color: #e5e5e5;
@@ -17,6 +29,14 @@
          justify-content: center;
          align-items: center;
       }
+
+      .edit {
+         background-color: #fdd7ac;
+         border-radius: 10%;
+         padding: 10px 15px;
+         text-decoration: none;
+      }
+
       .navbar{
          background-color: #f9ffca;
          height: auto;
@@ -89,54 +109,57 @@
       <table>
          <tr>
             <td>Nama Depan</td>
-            <td><b><?php echo $_SESSION['namaDepan'] ; ?></b></td>
+            <td><b><?php echo $row['namaDepan'] ; ?></b></td>
             <td class="spaceleftright"></td>
             <td>Nama Tengah</td>
-            <td><b><?php echo $_SESSION['namaTengah'] ; ?></b></td>
+            <td><b><?php echo $row['namaTengah'] ; ?></b></td>
             <td class="spaceleftright"></td>
             <td>Nama Belakang</td>
-            <td><b><?php echo $_SESSION['namaBelakang'] ; ?></b></td>
+            <td><b><?php echo $row['namaBelakang'] ; ?></b></td>
          </tr>
          <tr class="space"></tr>
          <tr>
             <td>Tempat Lahir</td>
-            <td><b><?php echo $_SESSION['tempatLahir'] ; ?></b></td>
+            <td><b><?php echo $row['tempatLahir'] ; ?></b></td>
             <td class="spaceleftright"></td>
             <td>Tanggal Lahir</td>
-            <td><b><?php echo $_SESSION['tanggalLahir'] ; ?></b></td>
+            <td><b><?php echo $row['tglLahir'] ; ?></b></td>
             <td class="spaceleftright"></td>
             <td>NIK</td>
-            <td><b><?php echo $_SESSION['NIK'] ; ?></b></td>
+            <td><b><?php echo $row['NIK'] ; ?></b></td>
          </tr>
          <tr class="space"></tr>
          <tr>
             <td>Warga Negara</td>
-            <td><b><?php echo $_SESSION['wargaNegara'] ; ?></b></td>
+            <td><b><?php echo $row['wargaNegara'] ; ?></b></td>
             <td class="spaceleftright"></td>
             <td>Email</td>
-            <td><b><?php echo $_SESSION['email'] ; ?></b></td>
+            <td><b><?php echo $row['email'] ; ?></b></td>
             <td class="spaceleftright"></td>
             <td>No HP</td>
-            <td><b><?php echo $_SESSION['noHP'] ; ?></b></td>
+            <td><b><?php echo $row['noHP'] ; ?></b></td>
          </tr>
          <tr class="space"></tr>
          <tr>
             <td>Alamat</td>
-            <td><b><?php echo $_SESSION['alamat'] ; ?></b></td>
+            <td><b><?php echo $row['alamat'] ; ?></b></td>
             <td class="spaceleftright"></td>
             <td>Kode Pos</td>
-            <td><b><?php echo $_SESSION['kodePos'] ; ?></b></td>
+            <td><b><?php echo $row['kodePos'] ; ?></b></td>
             <td class="spaceleftright"></td>
             <td>Foto Profil</td>
             <td>
-               <img src="img/<?php echo $_SESSION["fotoProfil"] ; ?>" width="80"> <br>
-               <?php echo $_SESSION['fotoProfil'] ; ?>
+               <img src="img/<?php echo $row["gambar"] ; ?>" width="80"> <br>
+               <?php echo $row['gambar'] ; ?>
             </td> 
             
             
          </tr>
       </table>
+      <table>
+         <a href="editProfile.php" class="edit" style="color: black;">Edit Profile</a>
+      </table>
    </div>
 
 </body>
-</html>
+</html> 
