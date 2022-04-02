@@ -1,5 +1,17 @@
 <?php 
    session_start();
+
+   if(!isset($_SESSION["id"])){
+      header("Location: welcome.php");
+      exit;
+   }
+
+   $db = mysqli_connect("localhost","root","","selfLearning2");
+   $id = $_SESSION['id'];
+   $result = mysqli_query($db,"SELECT * FROM user WHERE id = '$id' ") ;
+
+   $row = mysqli_fetch_assoc($result);
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -71,7 +83,7 @@
    </div>
    <div class="content">
       <div class="hello">
-         Halo <b><?php echo $_SESSION['namaDepan']." ".$_SESSION['namaTengah']." ".$_SESSION['namaBelakang'] ; ?></b>,Selamat datang di Aplikasi Pengelolaan Keuangan
+         Halo <b><?php echo $row['namaDepan']." ".$row['namaTengah']." ".$row['namaBelakang'] ; ?></b>,Selamat datang di Aplikasi Pengelolaan Keuangan
          <br><br><br><br><br><br>
       </div>
    </div>
