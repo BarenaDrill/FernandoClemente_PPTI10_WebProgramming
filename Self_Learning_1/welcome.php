@@ -1,5 +1,9 @@
 <?php 
    session_start();
+
+   $db = mysqli_connect("localhost","root","","selfLearning2");
+   $result = mysqli_query($db , "SELECT * FROM user") ;   
+
 ?>
 
 <!DOCTYPE html>
@@ -81,7 +85,7 @@
       </div>
       
       <div class="instruction">
-         <?php if(!isset($_SESSION['usernameSession'])) { ?>
+         <?php if(mysqli_num_rows($result) === 0 ) { ?>
             Silahkan lakukan registrasi terlebih dahulu  
          <?php } else { ?>
             Silahkan lakukan login
@@ -89,7 +93,7 @@
       </div>
 
       <div class="buttons">
-         <?php if(!isset($_SESSION['usernameSession'])) { ?>
+         <?php if(mysqli_num_rows($result) === 0 ) { ?>
             <a href="" class="login">Login</a>
             <a href="register.php" class="register">Register</a>
          <?php } else { ?>
